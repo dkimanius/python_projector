@@ -90,6 +90,10 @@ if __name__ == "__main__":
     spectral_mask[:min_spectral_index] = False
     spectral_mask[max_spectral_index:] = False
 
+    idx = np.arange(max_r)
+    idx = idx[spectral_mask.cpu().detach().numpy()]
+    print(f"spectral indices = {idx}")
+
     if args.particle_diameter is None:
         diameter_ang = image_size * 0.75 * pixel_size - args.circular_mask_thickness
         print(f"Assigning a diameter of {round(diameter_ang)} angstrom")
@@ -105,6 +109,8 @@ if __name__ == "__main__":
 
     circular_mask_thickness = args.circular_mask_thickness
     circular_mask_radius = diameter_ang / (2 * pixel_size)
+
+    print(f"circular_mask_radius = {circular_mask_radius}")
 
     v1 = load_mrc(args.half1)[0].copy()
     v1 = torch.from_numpy(v1)
@@ -127,8 +133,8 @@ if __name__ == "__main__":
 
     torch.no_grad()
 
-    star['particles']['MinFrcMean'] = 0
-    star['particles']['MaskedMinFrcMean'] = 0
+    star['particles']['MinFrcMean'] = float(0)
+    star['particles']['MaskedMinFrcMean'] = float(0)
 
     nr_parts = len(data_loader)
     pbar = tqdm(total=nr_parts, smoothing=0.1)
@@ -188,8 +194,8 @@ if __name__ == "__main__":
 
         particle_idx = sample["idx"].cpu().detach().numpy()
         for i, idx in enumerate(particle_idx):
-            star['particles'].at[idx, 'MinFrcMean'] = MinFrcMean[i]
-            star['particles'].at[idx, 'MaskedMinFrcMean'] = MaskedMinFrcMean[i]
+            star['particles'].at[idx, 'MinFrcMean'] = float(MinFrcMean[i])
+            star['particles'].at[idx, 'MaskedMinFrcMean'] = float(MaskedMinFrcMean[i])
             pbar.update()
 
     pbar.close()
