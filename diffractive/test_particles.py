@@ -196,6 +196,7 @@ if __name__ == "__main__":
         for i, idx in enumerate(particle_idx):
             star['particles'].at[idx, 'MinFrcMean'] = float(MinFrcMean[i])
             star['particles'].at[idx, 'MaskedMinFrcMean'] = float(MaskedMinFrcMean[i])
+            star['particles'].at[idx, 'rlnLogLikeliContribution'] = float(MaskedMinFrcMean[i])
             pbar.update()
 
     pbar.close()
