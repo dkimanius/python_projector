@@ -54,6 +54,8 @@ if __name__ == "__main__":
     parser.add_argument('--circular-mask-thickness', help='Circular mask thickness', type=float, default=5)
     parser.add_argument('--particle-diameter', help='Circular mask diameter', type=float, default=None)
     parser.add_argument('--plot', help='Plot each particle', action='store_true')
+    parser.add_argument('--threads', help='threads for loading data', type=int, default=5)
+    parser.add_argument('--batch_size', type=int, default=50)
 
     args = parser.parse_args()
 
@@ -119,7 +121,8 @@ if __name__ == "__main__":
     data_loader = DataLoader(
         dataset=dataset,
         shuffle=False,
-        num_workers=0
+        num_workers=args.threads,
+        batch_size=args.batch_size
     )
 
     torch.no_grad()
@@ -192,7 +195,7 @@ if __name__ == "__main__":
     pbar.close()
     output_fn = os.path.splitext(args.star)[0]
     output_fn = f"{output_fn}_frc.star"
-    starfile.write(star, output_fn)
+    starfile.write(star, output_fn, overwrite=True)
 
     print(f"Saved to {output_fn}")
 
