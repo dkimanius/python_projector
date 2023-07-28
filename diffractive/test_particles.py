@@ -55,7 +55,7 @@ if __name__ == "__main__":
     parser.add_argument('--particle-diameter', help='Circular mask diameter', type=float, default=None)
     parser.add_argument('--plot', help='Plot each particle', action='store_true')
     parser.add_argument('--threads', help='threads for loading data', type=int, default=5)
-    parser.add_argument('--batch_size', type=int, default=50)
+    parser.add_argument('--batch-size', type=int, default=50)
 
     args = parser.parse_args()
 
@@ -136,7 +136,7 @@ if __name__ == "__main__":
     star['particles']['MinFrcMean'] = float(0)
     star['particles']['MaskedMinFrcMean'] = float(0)
 
-    nr_parts = len(data_loader)
+    nr_parts = len(dataset)
     pbar = tqdm(total=nr_parts, smoothing=0.1)
 
     for sample in data_loader:
