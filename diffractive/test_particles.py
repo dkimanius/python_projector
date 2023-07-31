@@ -183,20 +183,27 @@ if __name__ == "__main__":
             plt.plot(np.arange(max_r), frc2[0].detach().cpu().numpy())
             plt.show()
 
-        frc1_mean = torch.mean(frc1, dim=1)
-        frc2_mean = torch.mean(frc2, dim=1)
+        frc1_mean = torch.mean(frc1, dim=1).cpu().detach().numpy()
+        frc2_mean = torch.mean(frc2, dim=1).cpu().detach().numpy()
 
-        frc1_mask_mean = torch.mean(frc1[:, spectral_mask], dim=1)
-        frc2_mask_mean = torch.mean(frc2[:, spectral_mask], dim=1)
-
-        MinFrcMean = torch.minimum(frc1_mean, frc2_mean).cpu().detach().numpy()
-        MaskedMinFrcMean = torch.minimum(frc1_mask_mean, frc2_mask_mean).cpu().detach().numpy()
+        frc1_mask_mean = torch.mean(frc1[:, spectral_mask], dim=1).cpu().detach().numpy()
+        frc2_mask_mean = torch.mean(frc2[:, spectral_mask], dim=1).cpu().detach().numpy()
 
         particle_idx = sample["idx"].cpu().detach().numpy()
         for i, idx in enumerate(particle_idx):
-            star['particles'].at[idx, 'MinFrcMean'] = float(MinFrcMean[i])
-            star['particles'].at[idx, 'MaskedMinFrcMean'] = float(MaskedMinFrcMean[i])
-            star['particles'].at[idx, 'rlnLogLikeliContribution'] = float(MaskedMinFrcMean[i])
+            random_subset = star['particles'].at[idx, 'rlnRandomSubset']
+            if random_subset == 1:
+                frc_mean = frc1_mean[i]
+                frc_masked_mean = frc1_mask_mean[i]
+            elif random_subset == 2:
+                frc_mean = frc2_mean[i]
+                frc_masked_mean = frc2_mask_mean[i]
+            else:
+                raise RuntimeError(f"Bad random subset index ({random_subset})")
+
+            star['particles'].at[idx, 'MinFrcMean'] = float(frc_mean)
+            star['particles'].at[idx, 'MaskedMinFrcMean'] = float(frc_masked_mean)
+            star['particles'].at[idx, 'rlnLogLikeliContribution'] = float(frc_masked_mean)
             pbar.update()
 
     pbar.close()
